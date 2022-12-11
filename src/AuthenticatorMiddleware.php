@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Auth;
+namespace Bermuda\Authenticator;
 
 use Bermuda\HTTP\Responder;
 use Psr\Http\Message\ResponseInterface;
@@ -8,7 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-final class AuthMiddleware implements MiddlewareInterface
+final class AuthenticatorMiddleware implements MiddlewareInterface
 {
     public function __construct(
         private readonly Authenticator $authenticator,
