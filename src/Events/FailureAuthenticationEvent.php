@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Auth\Events;
+namespace Bermuda\Authenticator\Events;
 
-use App\Auth\AuthenticationException;
+use  Bermuda\Authenticator\AuthenticationException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
