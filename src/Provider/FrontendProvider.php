@@ -10,7 +10,7 @@ use Bermuda\Authenticator\ClientInterface;
 use Bermuda\Authenticator\Provider\Token\Token;
 use Bermuda\Authenticator\Provider\Token\TokenEncoderInterface;
 use Bermuda\Authenticator\Provider\Token\TokenException;
-use Bermuda\Authentication\UserInterface;
+use Bermuda\Authenticator\UserInterface;
 use Dflydev\FigCookies\Cookies;
 use Dflydev\FigCookies\FigResponseCookies;
 use Psr\Container\ContainerExceptionInterface;
