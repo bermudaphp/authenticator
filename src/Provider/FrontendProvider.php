@@ -2,13 +2,14 @@
 
 namespace App\Auth\Provider;
 
-use App\Auth\AuthenticationException;
-use App\Auth\AuthenticationProvider;
-use App\Auth\Client\JsClient;
-use App\Auth\ClientInterface;
-use App\Auth\Provider\Token\Token;
-use App\Auth\Provider\Token\TokenEncoderInterface;
-use App\Auth\Provider\Token\TokenException;
+use Bermuda\HTTP\Cookie\CookieParams;
+use Bermuda\Authenticator\AuthenticationException;
+use Bermuda\Authenticator\AuthenticationProvider;
+use Bermuda\Authenticator\Client\JsClient;
+use Bermuda\Authenticator\ClientInterface;
+use Bermuda\Authenticator\Provider\Token\Token;
+use Bermuda\Authenticator\Provider\Token\TokenEncoderInterface;
+use Bermuda\Authenticator\Provider\Token\TokenException;
 use Bermuda\Authentication\UserInterface;
 use Dflydev\FigCookies\Cookies;
 use Dflydev\FigCookies\FigResponseCookies;
