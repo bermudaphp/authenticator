@@ -8,7 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-final class AuthenticatorMiddleware implements MiddlewareInterface
+final class AuthenticationMiddleware implements MiddlewareInterface
 {
     public function __construct(
         private readonly Authenticator $authenticator,
