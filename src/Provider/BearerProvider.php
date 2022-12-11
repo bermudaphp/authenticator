@@ -5,7 +5,7 @@ namespace Bermuda\Authenticator\Provider;
 use Bermuda\Authenticator\Client\Client;
 use Bermuda\Authenticator\AuthenticationException;
 use Bermuda\Authenticator\AuthenticationProvider;
-use Bermuda\Authenticator\Token\BearerTokenGeneratorInterface;;
+use Bermuda\Authenticator\Provider\Token\BearerTokenGeneratorInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
