@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Auth;
+namespace Bermuda\Authenticator;
 
-use Bermuda\Authentication\UserInterface;
+use Bermuda\Authenticator\UserInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
