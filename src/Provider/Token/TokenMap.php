@@ -1,6 +1,6 @@
 <?php
 
-namespace App\auth\provider;
+namespace Bermuda\Authenticator\Provider\Token;
 
 use Bermuda\Arrayable;
 
