@@ -1,6 +1,6 @@
 <?php
 
-namespace App\auth\provider\Token;
+namespace Bermuda\Authenticator\Provider\Token;
 
 class BearerTokenGenerator implements BearerTokenGeneratorInterface
 {
