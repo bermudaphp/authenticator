@@ -1,10 +1,10 @@
 <?php
 
-namespace App\auth\provider;
+namespace Bermuda\Authenticator\Provider;
 
-use App\Auth\AuthenticationProvider;
-use App\Auth\ClientInterface;
-use Bermuda\Authentication\UserInterface;
+use Bermuda\Authenticator\AuthenticationProvider;
+use Bermuda\Authenticator\ClientInterface;
+use Bermuda\Authenticator\UserInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 trait ProviderTrait
