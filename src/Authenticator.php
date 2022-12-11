@@ -8,7 +8,7 @@ use Bermuda\Authenticator\AuthEventListenerInterface;
 use Bermuda\Authenticator\BeforeAuthenticationEvent;
 use Bermuda\Authenticator\EventType;
 use Bermuda\Authenticator\FailureAuthenticationEvent;
-use Bermuda\Authentication\UserInterface;
+use Bermuda\Authenticator\UserInterface;
 use Bermuda\Config\Config;
 use Bermuda\Eventor\Event;
 use Bermuda\Eventor\EventDispatcher;
