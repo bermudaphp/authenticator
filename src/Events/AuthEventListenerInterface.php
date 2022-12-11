@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Auth\Events;
+namespace Bermuda\Authenticator\Events;
 
 interface AuthEventListenerInterface
 {
