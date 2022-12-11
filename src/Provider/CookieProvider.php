@@ -4,8 +4,8 @@ namespace Bermuda\Authenticator\Provider;
 
 use Bermuda\Authenticator\AuthenticationException;
 use Bermuda\Authenticator\AuthenticationProvider;
-use Bermuda\Authentication\UserInterface;
-use Bermuda\Authentication\UserProviderInterface;
+use Bermuda\Authenticator\UserInterface;
+use Bermuda\Authenticator\UserProviderInterface;
 use Bermuda\HTTP\Cookie\CookieParams;
 use Dflydev\FigCookies\Cookies;
 use Dflydev\FigCookies\FigResponseCookies;
