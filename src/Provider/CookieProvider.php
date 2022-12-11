@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Auth\Provider;
+namespace Bermuda\Authenticator\Provider;
 
-use App\Auth\AuthenticationException;
-use App\Auth\AuthenticationProvider;
+use Bermuda\Authenticator\AuthenticationException;
+use Bermuda\Authenticator\AuthenticationProvider;
 use Bermuda\Authentication\UserInterface;
 use Bermuda\Authentication\UserProviderInterface;
+use Bermuda\HTTP\Cookie\CookieParams;
 use Dflydev\FigCookies\Cookies;
 use Dflydev\FigCookies\FigResponseCookies;
 use Psr\Container\ContainerExceptionInterface;
