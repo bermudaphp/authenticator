@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Auth\Provider\Token;
+namespace Bermuda\Authenticator\Provider\Token;
 
 use Psr\Container\ContainerInterface;
 
