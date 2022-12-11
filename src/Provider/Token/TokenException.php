@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Auth\Provider\Token;
+namespace Bermuda\Authenticator\Provider\Token
 
 class TokenException extends \Exception
 {
