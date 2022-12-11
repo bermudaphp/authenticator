@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Auth;
+namespace Bermuda\Authenticator;
 
-use App\Auth\Events\AfterAuthenticationEvent;
-use App\Auth\Events\AuthEvent;
-use App\Auth\Events\AuthEventListenerInterface;
-use App\Auth\Events\BeforeAuthenticationEvent;
-use App\Auth\Events\EventType;
-use App\Auth\Events\FailureAuthenticationEvent;
+use Bermuda\Authenticator\Events\AfterAuthenticationEvent;
+use Bermuda\Authenticator\AuthEvent;
+use Bermuda\Authenticator\AuthEventListenerInterface;
+use Bermuda\Authenticator\BeforeAuthenticationEvent;
+use Bermuda\Authenticator\EventType;
+use Bermuda\Authenticator\FailureAuthenticationEvent;
 use Bermuda\Authentication\UserInterface;
 use Bermuda\Config\Config;
 use Bermuda\Eventor\Event;
