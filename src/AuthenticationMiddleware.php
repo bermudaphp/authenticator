@@ -28,7 +28,7 @@ final class AuthenticationMiddleware implements MiddlewareInterface
                 'error_code' => $e->getPrevious() ? $e->getCode() : 401
             ]);
 
-            return $this->authenticator->clearAuthInfo($response);
+            return $this->authenticator->clear($response);
         }
 
         $response = $this->authenticator->getUser() !== null ?
