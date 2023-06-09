@@ -16,9 +16,6 @@ final class AuthenticationMiddleware implements MiddlewareInterface
     ) {
     }
 
-    /**
-     * @throws AuthenticationException
-     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
