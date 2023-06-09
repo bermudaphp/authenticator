@@ -18,7 +18,7 @@ final class JsClient implements ClientInterface
     }
 
     /**
-     * @return string|null
+     * @return null
      */
     public function getSecret(): ?string
     {
