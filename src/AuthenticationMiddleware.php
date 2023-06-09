@@ -12,7 +12,8 @@ final class AuthenticationMiddleware implements MiddlewareInterface
 {
     public function __construct(
         private readonly Authenticator $authenticator,
-        private readonly Responder $responder) {
+        private readonly Responder $responder
+    ) {
     }
 
     /**
