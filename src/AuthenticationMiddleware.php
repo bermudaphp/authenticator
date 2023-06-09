@@ -23,16 +23,12 @@ final class AuthenticationMiddleware implements MiddlewareInterface
         try {
             $this->authenticator->authentication($request);
         } catch (AuthenticationException $e) {
-            $response = $this->responder->respond(401, [
-                'error_msg' => $e->getMessage(),
-                'error_code' => $e->getPrevious() ? $e->getCode() : 401
-            ]);
-
+            $response = $e->writeResponse($this->responder->respond(401));
             return $this->authenticator->clear($response);
         }
 
         $response = $this->authenticator->getUser() !== null ?
-            $handler->handle($request->withAttribute(AuthenticationProvider::user_attribute,
+            $handler->handle($request->withAttribute(AuthenticationProvider::userAttribute,
                 $this->authenticator->getUser())
             ) : $handler->handle($request);
 
