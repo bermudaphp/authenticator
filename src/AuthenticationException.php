@@ -7,29 +7,13 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class AuthenticationException extends \Exception
 {
-    public readonly int $errorCode;
-    public readonly ServerRequestInterface $serverRequest;
     public const exceptionAttribute = AuthenticationException::class;
     
-    public static function create(string $message, int $errorCode, ServerRequestInterface $serverRequest, \Throwable $prev = null): self
+    public function __construct(string $msg, public readonly ServerRequestInterface $serverRequest, \Throwable $prev = null)
     {
-        $self = new static($message, 401, $prev);
-
-        $self->errorCode = $errorCode;
-        $self->serverRequest = $serverRequest;
-
-        return $self;
+        parent::__construct($msg, 401, $prev);     
     }
-
-    /**
-     * @param ServerRequestInterface $serverRequest
-     * @return static|null
-     */
-    public static function getFromServerRequest(ServerRequestInterface $serverRequest): ?self
-    {
-        return $serverRequest->getAttribute(static::exceptionAttribute);
-    }
-
+    
     /**
      * @param ServerRequestInterface $serverRequest
      * @param ResponseInterface $response
@@ -37,18 +21,9 @@ class AuthenticationException extends \Exception
      */
     public static function writeResponse(ServerRequestInterface $serverRequest, ResponseInterface $response): ResponseInterface
     {
-        $e = static::getFromServerRequest($serverRequest);
-        if ($e instanceof AuthenticationException) {
-            $response->getBody()->write(json_encode([
-                'error_msg' => $e->getMessage(),
-                'error_code' => $e->errorCode
-            ]));
-
-            return $response;
-        }
-
         $response->getBody()->write(json_encode([
-            'error_msg' => 'Access denied. Unauthorized request',
+            'error_msg' => $e->getMessage(),
+            'error_code' => $e->errorCode
         ]));
 
         return $response;
