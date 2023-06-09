@@ -25,7 +25,7 @@ trait ProviderTrait
      */
     public function authenticateUser(UserInterface $user, ServerRequestInterface $serverRequest): ServerRequestInterface
     {
-        return $serverRequest->withAttribute(AuthenticationProvider::user_attribute, $user);
+        return $serverRequest->withAttribute(AuthenticationProvider::userAttribute, $user);
     }
 
     /**
@@ -34,6 +34,6 @@ trait ProviderTrait
      */
     public static function getUser(ServerRequestInterface $serverRequest): ?UserInterface
     {
-        return $serverRequest->getAttribute(AuthenticationProvider::user_attribute);
+        return $serverRequest->getAttribute(AuthenticationProvider::userAttribute);
     }
 }
