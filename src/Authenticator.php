@@ -72,8 +72,7 @@ final class Authenticator implements MiddlewareInterface
      */
     public function hasProvider(string|AuthenticationProvider $provider): bool
     {
-        return array_key_exists(is_string($provider)
-            ? $provider : $provider::class , $this->providers);
+        return array_key_exists(is_string($provider) ? $provider : $provider::class, $this->providers);
     }
 
     /**
@@ -97,7 +96,7 @@ final class Authenticator implements MiddlewareInterface
      */
     public function authenticateUser(UserInterface $user, ServerRequestInterface $request): ServerRequestInterface
     {
-        return $request->withAttribute(AuthenticationProvider::user_attribute, $user);
+        return $request->withAttribute(AuthenticationProvider::userAttribute, $user);
     }
 
     /**
