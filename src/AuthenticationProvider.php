@@ -8,12 +8,10 @@ use Psr\Http\Message\ServerRequestInterface;
 
 interface AuthenticationProvider
 {
-    public const user_attribute = UserInterface::class;
-    public const client_attribute = ClientInterface::class;
+    public const userAttribute = UserInterface::class;
+    public const clientAttribute = ClientInterface::class;
 
     /**
-     * @param ServerRequestInterface $request
-     * @return ServerRequestInterface
      * @throws AuthenticationException
      */
     public function authentication(ServerRequestInterface $request): ServerRequestInterface ;
