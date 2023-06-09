@@ -7,9 +7,10 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class AuthenticationException extends \Exception
 {
-    public const exception_attribute = AuthenticationException::class;
     public readonly int $errorCode;
     public readonly ServerRequestInterface $serverRequest;
+    public const exceptionAttribute = AuthenticationException::class;
+    
     public static function create(string $message, int $errorCode, ServerRequestInterface $serverRequest, \Throwable $prev = null): self
     {
         $self = new static($message, 401, $prev);
@@ -26,7 +27,7 @@ class AuthenticationException extends \Exception
      */
     public static function getFromServerRequest(ServerRequestInterface $serverRequest): ?self
     {
-        return $serverRequest->getAttribute(static::exception_attribute);
+        return $serverRequest->getAttribute(static::exceptionAttribute);
     }
 
     /**
