@@ -50,7 +50,7 @@ final class Authenticator implements MiddlewareInterface
 
     public function logout(ServerRequestInterface $serverRequest): ResponseInterface
     {
-        return $this->clearData($serverRequest, $this->responder->respond(204));
+        return $this->provider->clearData($serverRequest, $this->responder->respond(204));
     }
 
     /**
