@@ -2,77 +2,38 @@
 
 namespace Bermuda\Authenticator;
 
-use Bermuda\Authenticator\Events\AfterAuthenticationEvent;
-use Bermuda\Authenticator\AuthEvent;
-use Bermuda\Authenticator\AuthEventListenerInterface;
-use Bermuda\Authenticator\BeforeAuthenticationEvent;
-use Bermuda\Authenticator\EventType;
-use Bermuda\Authenticator\FailureAuthenticationEvent;
-use Bermuda\Authenticator\UserInterface;
-use Bermuda\Config\Config;
-use Bermuda\Eventor\Event;
+use Bermuda\Authenticator\Events\EventListener;
+use Bermuda\Authenticator\Events\EventType;
+use Bermuda\Authenticator\Events\FailureAuthenticationEvent;
+use Bermuda\Authenticator\Events\LoginAttemptionEvent;
+use Bermuda\Authenticator\User\UserInterface;
 use Bermuda\Eventor\EventDispatcher;
 use Bermuda\Eventor\EventDispatcherInterface;
+use Bermuda\Authenticator\Strategy\InteractiveAuthenticationStrategyInterface;
 use Bermuda\Eventor\ListenerProviderInterface;
 use Bermuda\Eventor\Provider\Provider;
 use Bermuda\HTTP\Responder;
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
+/**
+ * @mixin AuthenticationProvider
+ */
 final class Authenticator implements MiddlewareInterface
 {
-    /**
-     * @var AuthenticationProvider[]
-     */
-    private array $providers = [];
+    private ?UserInterface $user = null;
     private ListenerProviderInterface $listenerProvider;
 
     public function __construct(
-        AuthenticationProvider $provider,
-        private readonly Responder $responder,
+        public readonly AuthenticationProvider $provider,
+        public readonly Responder $responder,
+        private readonly InteractiveAuthenticationStrategyInterface $strategy,
         private EventDispatcherInterface $dispatcher = new EventDispatcher
     ) {
-        $this->addProvider($provider);
         $this->dispatcher = $this->dispatcher->attach($this->listenerProvider = new Provider);
-    }
-
-    /**
-     * @param AuthenticationProvider $provider
-     * @return $this
-     */
-    public function addProvider(AuthenticationProvider $provider): self
-    {
-        $this->providers[$provider::class] = $provider;
-        return $this;
-    }
-
-    /**
-     * @param EventType $eventType
-     * @param AuthEventListenerInterface $listener
-     * @return $this
-     */
-    public function listen(EventType $eventType, AuthEventListenerInterface $listener): self
-    {
-        $this->listenerProvider->listen($eventType->getEventType(), static function(AuthEvent $event) use ($listener): Event {
-            $listener->handle($event);
-            return $event;
-        });
-
-        return $this;
-    }
-
-    /**
-     * @param string|AuthenticationProvider $provider
-     * @return bool
-     */
-    public function hasProvider(string|AuthenticationProvider $provider): bool
-    {
-        return array_key_exists(is_string($provider) ? $provider : $provider::class, $this->providers);
     }
 
     /**
@@ -81,91 +42,62 @@ final class Authenticator implements MiddlewareInterface
      */
     public static function createFromContainer(ContainerInterface $container): self
     {
-        $config = $container->get(Config::CONTAINER_CONFIG_KEY);
-        $providers = $config['auth']['providers'];
-        $provider = array_shift($providers);
-        $authenticator = new self($container->get($provider), $container->get(Responder::class));
-        foreach ($providers as $provider) $authenticator->addProvider($container->get($provider));
-        return $authenticator;
+        return new self($container->get(AuthenticationProvider::class),
+            $container->get(Responder::class),
+            $container->get(InteractiveAuthenticationStrategyInterface::class)
+        );
     }
 
-    /**
-     * @param UserInterface $user
-     * @param ServerRequestInterface $request
-     * @return ServerRequestInterface
-     */
-    public function authenticateUser(UserInterface $user, ServerRequestInterface $request): ServerRequestInterface
+    public function logout(ServerRequestInterface $serverRequest): ResponseInterface
     {
-        return $request->withAttribute(AuthenticationProvider::userAttribute, $user);
+        return $this->clearData($serverRequest, $this->responder->respond(204));
     }
 
     /**
-     * @param ServerRequestInterface $request
+     * @param ServerRequestInterface $serverRequest
+     * @throws AuthenticationException
      * @return ServerRequestInterface|ResponseInterface
      */
-    public function authentication(ServerRequestInterface $request): ServerRequestInterface|ResponseInterface
+    public function attempt(ServerRequestInterface $serverRequest, bool $fireEvent = false): ServerRequestInterface|ResponseInterface
     {
-        foreach ($this->providers as $provider) {
-            try {
-                $request = $this->dispatcher->dispatch(new BeforeAuthenticationEvent($request))->request;
-                $request = $provider->authentication($request);
-            } catch (AuthenticationException $e) {
-                $response = $provider->unauthorized($e->serverRequest, $this->responder->respond(401));
-                return $this->dispatcher->dispatch(new FailureAuthenticationEvent($request, $response, $e))->response;
-            }
+        if ($fireEvent) {
+            $serverRequest = $this->dispatch(new LoginAttemptionEvent($serverRequest))
+                ->serverRequest;
         }
 
-        if (!$this->isAuthenticated($request)) {
-            return $this->dispatcher->dispatch(
-                new AfterAuthenticationEvent($request, false, $this->unauthorized($request, $this->responder->respond(401)))
-            )->response;
-        }
-
-        return $this->dispatcher->dispatch(new AfterAuthenticationEvent($request, true))->request;
+        return $this->strategy->attempt($serverRequest, $this->provider);
     }
 
     /**
-     * @param ServerRequestInterface $serverRequest
-     * @return bool
+     * @throws AuthenticationException
      */
-    public function isAuthenticated(ServerRequestInterface $serverRequest): bool
+    public function authentication(ServerRequestInterface $request, UserInterface $user=null): ServerRequestInterface
     {
-        foreach ($this->providers as $provider) if ($provider->isAuthenticated($serverRequest)) return true;
-        return false;
+        $request = $this->provider->authentication($request, $user);
+        $this->user = $this->provider::getUser($request);
+
+        return $request;
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @return ResponseInterface
-     */
-    public function unauthorized(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function listen(EventType $type, EventListener $listener): self
     {
-        foreach ($this->providers as $provider) $response = $provider->unauthorized($request, $this->responder->respond(401));
-        return $response;
+        $this->listenerProvider->listen($type->getType(),
+            static function ($event) use ($listener) {
+                $listener->handle($event);
+                return $event;
+        });
+
+        return $this;
     }
 
-    /**
-     * @param ServerRequestInterface $serverRequest
-     * @param ResponseInterface $response
-     * @param \DateTimeInterface|null $expires
-     * @return ResponseInterface
-     */
-    public function write(ServerRequestInterface $serverRequest, ResponseInterface $response, \DateTimeInterface $expires = null): ResponseInterface
+    public function dispatch(FailureAuthenticationEvent|LoginAttemptionEvent $event): FailureAuthenticationEvent|LoginAttemptionEvent
     {
-        foreach ($this->providers as $provider) $response = $provider->write($serverRequest, $response, $expires);
-        return $response;
+        return $this->dispatcher->dispatch($event);
     }
 
-    /**
-     * @param ServerRequestInterface $serverRequest
-     * @param ResponseInterface $response
-     * @return ResponseInterface
-     */
-    public function clear(ServerRequestInterface $serverRequest, ResponseInterface $response): ResponseInterface
+    public function getUser():? UserInterface
     {
-        foreach ($this->providers as $provider) $response = $provider->clear($serverRequest, $response);
-        return $response;
+        return $this->user;
     }
 
     /**
@@ -175,6 +107,18 @@ final class Authenticator implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        return ($result = $this->authentication($request)) instanceof ResponseInterface ? $result : $handler->handle($result);
+        try {
+            $request = $this->authentication($request);
+        } catch (AuthenticationException $e) {
+            $response = $this->responder->respond(401);
+            $response = $e->writeResponse($response);
+
+            $event = FailureAuthenticationEvent::fromException($e, $response);
+            $this->dispatcher->dispatch($event);
+
+            return $event->response;
+        }
+
+        return $handler->handle($request);
     }
 }

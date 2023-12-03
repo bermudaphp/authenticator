@@ -19,13 +19,12 @@ class AuthenticationException extends \Exception
      * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public static function writeResponse(ServerRequestInterface $serverRequest, ResponseInterface $response): ResponseInterface
+    public function writeResponse(ServerRequestInterface $serverRequest, ResponseInterface $response): ResponseInterface
     {
         $response->getBody()->write(json_encode([
-            'error_msg' => $e->getMessage(),
-            'error_code' => $e->errorCode
+            'error' => $this->getMessage(),
         ]));
 
-        return $response;
+        return $response->withStatus(401);
     }
 }
