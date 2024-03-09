@@ -63,15 +63,17 @@ final class Authenticator implements MiddlewareInterface
         if ($fireEvents) {
             $serverRequest = $this->dispatch(new LoginAttemptionEvent($serverRequest))
                 ->serverRequest;
+            
+            try {
+                return $this->strategy->attempt($serverRequest, $this->provider);
+            }
+            catch (AuthenticationException $e) {
+                $this->dispatch(FailureAuthenticationEvent::fromException($e, $e->writeResponse($this->responder->respond(401))));
+                throw $e;
+            }
         }
 
-        try {
-            return $this->strategy->attempt($serverRequest, $this->provider);
-        }
-        catch (AuthenticationException $e) {
-            $this->dispatch(FailureAuthenticationEvent::fromException($e, $e->writeResponse($this->responder->respond(401))));
-            throw $e;
-        }
+        return $this->strategy->attempt($serverRequest, $this->provider);
     }
 
     /**
